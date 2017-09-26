@@ -4,6 +4,7 @@ using System.Text;
 using System.Data;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Data.OleDb;
 
 namespace DownLoad
 {
@@ -384,5 +385,50 @@ namespace DownLoad
             }
             return true;
         }
+        /// <summary>
+        /// 读取Excel成DataTable
+        /// </summary>
+        /// <param name="Path"></param>
+        /// <returns></returns>
+        public DataTable ExcelToDS(string filename, string dbName, string sheetName = "")
+        {
+            string strConn = string.Empty;
+            DataTable dt = null;
+            OleDbConnection conn=null;
+            try
+            {
+                if (filename.EndsWith(".xls"))
+                {
+                    strConn = "Provider=Microsoft.Jet.OLEDB.4.0;" + "Data Source=" + filename + ";" + "Extended Properties=\"Excel 8.0;HDR=YES;IMEX=1\"";
+                }
+                else
+                {
+                    strConn = "Provider=Microsoft.ACE.OLEDB.12.0;" + "Data Source=" + filename + ";" + ";Extended Properties=\"Excel 12.0;HDR=YES;IMEX=1\"";
+                }
+                conn = new OleDbConnection(strConn);
+                conn.Open();
+                string strExcel = "";
+                DataSet ds = new DataSet();
+                OleDbDataAdapter myCommand = null;
+                strExcel = "select * from [sheet1$]";
+                myCommand = new OleDbDataAdapter(strExcel, strConn);
+                dt = new DataTable();
+                myCommand.Fill(ds, dbName);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                if (conn != null)
+                {
+                    conn.Close();
+                }
+            }
+            return dt;
+        }
+
     }
 }

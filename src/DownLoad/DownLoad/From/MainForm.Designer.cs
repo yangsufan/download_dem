@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnImportDataList = new System.Windows.Forms.Button();
+            this.btnGetLocalList = new System.Windows.Forms.Button();
             this.btnSelectFilePath = new System.Windows.Forms.Button();
             this.btnStartDownload = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -41,7 +43,7 @@
             this.btnLogin = new System.Windows.Forms.Button();
             this.btnGetDataList = new System.Windows.Forms.Button();
             this.dgvAllData = new System.Windows.Forms.DataGridView();
-            this.button1 = new System.Windows.Forms.Button();
+            this.cbUsePro = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -58,7 +60,9 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.button1);
+            this.splitContainer1.Panel1.Controls.Add(this.cbUsePro);
+            this.splitContainer1.Panel1.Controls.Add(this.btnImportDataList);
+            this.splitContainer1.Panel1.Controls.Add(this.btnGetLocalList);
             this.splitContainer1.Panel1.Controls.Add(this.btnSelectFilePath);
             this.splitContainer1.Panel1.Controls.Add(this.btnStartDownload);
             this.splitContainer1.Panel1.Controls.Add(this.label1);
@@ -77,6 +81,27 @@
             this.splitContainer1.Size = new System.Drawing.Size(1667, 776);
             this.splitContainer1.SplitterDistance = 269;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // btnImportDataList
+            // 
+            this.btnImportDataList.Location = new System.Drawing.Point(387, 231);
+            this.btnImportDataList.Name = "btnImportDataList";
+            this.btnImportDataList.Size = new System.Drawing.Size(95, 23);
+            this.btnImportDataList.TabIndex = 13;
+            this.btnImportDataList.Text = "导入数据列表";
+            this.btnImportDataList.UseVisualStyleBackColor = true;
+            this.btnImportDataList.Visible = false;
+            this.btnImportDataList.Click += new System.EventHandler(this.btnImportDataList_Click);
+            // 
+            // btnGetLocalList
+            // 
+            this.btnGetLocalList.Location = new System.Drawing.Point(271, 231);
+            this.btnGetLocalList.Name = "btnGetLocalList";
+            this.btnGetLocalList.Size = new System.Drawing.Size(108, 23);
+            this.btnGetLocalList.TabIndex = 12;
+            this.btnGetLocalList.Text = "获取本地列表";
+            this.btnGetLocalList.UseVisualStyleBackColor = true;
+            this.btnGetLocalList.Click += new System.EventHandler(this.btnGetLocalList_Click);
             // 
             // btnSelectFilePath
             // 
@@ -150,6 +175,7 @@
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(246, 21);
             this.txtPassword.TabIndex = 3;
+            this.txtPassword.Text = "sufan2008300379";
             this.txtPassword.TextChanged += new System.EventHandler(this.txtPassword_TextChanged);
             // 
             // txtUserName
@@ -158,6 +184,7 @@
             this.txtUserName.Name = "txtUserName";
             this.txtUserName.Size = new System.Drawing.Size(246, 21);
             this.txtUserName.TabIndex = 2;
+            this.txtUserName.Text = "sufan_89@hotmail.com";
             this.txtUserName.TextChanged += new System.EventHandler(this.txtUserName_TextChanged);
             // 
             // btnLogin
@@ -195,15 +222,15 @@
             this.dgvAllData.Size = new System.Drawing.Size(1667, 503);
             this.dgvAllData.TabIndex = 1;
             // 
-            // button1
+            // cbUsePro
             // 
-            this.button1.Location = new System.Drawing.Point(271, 231);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(95, 23);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "强制导出";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.cbUsePro.AutoSize = true;
+            this.cbUsePro.Location = new System.Drawing.Point(503, 35);
+            this.cbUsePro.Name = "cbUsePro";
+            this.cbUsePro.Size = new System.Drawing.Size(72, 16);
+            this.cbUsePro.TabIndex = 16;
+            this.cbUsePro.Text = "使用代理";
+            this.cbUsePro.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -239,7 +266,9 @@
         private System.Windows.Forms.Button btnStartDownload;
         private System.Windows.Forms.DataGridView dgvAllData;
         private System.Windows.Forms.Button btnSelectFilePath;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnGetLocalList;
+        private System.Windows.Forms.Button btnImportDataList;
+        private System.Windows.Forms.CheckBox cbUsePro;
     }
 }
 

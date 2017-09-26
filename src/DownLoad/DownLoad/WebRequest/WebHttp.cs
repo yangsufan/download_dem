@@ -14,11 +14,23 @@ namespace DownLoad
 {
     public class WebHttp
     {
-        public WebHttp()
+        public WebHttp(DbOperator dbOp)
         {
             m_DownLoadList = new List<string>();
+            m_DbOp = dbOp;
+            m_DownLoadIngStyle = new DataGridViewCellStyle();
+            m_DownLoadedStyle = new DataGridViewCellStyle();
+            m_ErrorStyle = new DataGridViewCellStyle();
+            m_DownLoadIngStyle.BackColor = System.Drawing.Color.Blue;
+            m_DownLoadedStyle.BackColor = System.Drawing.Color.Green;
+            m_ErrorStyle.BackColor = System.Drawing.Color.Red;
         }
         public List<string> m_DownLoadList = null;
+        private DbOperator m_DbOp=null;
+        private DataGridViewCellStyle m_DownLoadIngStyle = null;
+        private DataGridViewCellStyle m_DownLoadedStyle = null;
+        private DataGridViewCellStyle m_ErrorStyle = null;
+
         /// <summary>
         /// Http发送Get请求方法
         /// </summary>
@@ -60,6 +72,11 @@ namespace DownLoad
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
                 request.Method = "GET";
                 request.ContentType = "text/html;charset=UTF-8";
+                //WebProxy proxy = new WebProxy();
+                //proxy.Address = new Uri("http://192.168.1.117:18888");              //網關服務器:端口
+                //proxy.Credentials = new NetworkCredential("www", "1234567");      //用戶名,密碼
+                //request.UseDefaultCredentials = true;                                      //啟用網關認証
+                //request.Proxy = proxy;
                 if (LoginCooikes != null)
                 {
                     request.CookieContainer = new CookieContainer();
@@ -188,17 +205,23 @@ namespace DownLoad
         {
             DownLoadState state = ar.AsyncState as DownLoadState;
             DataGridViewRow pDownRow = state.DownloadRow;
+            string[] updateStr = new string[3] {"","","" };
             try
             {
                 WebResponse response = state.WebRequestObject.EndGetResponse(ar);
                 Stream inStream = response.GetResponseStream();
                 byte[] buffer = new byte[1024 * 1024];
+                if (System.IO.File.Exists(state.FileName))
+                {
+                    System.IO.File.Delete(state.FileName);
+                }
                 Stream outStream = System.IO.File.Create(state.FileName);
                 long dataLength = response.ContentLength;
                 long temp = 0;
                 try
                 {
                     pDownRow.Cells["uri"].Value = response.ResponseUri;
+                    pDownRow.DefaultCellStyle = m_DownLoadIngStyle;
                     int l;
                     do
                     {
@@ -207,7 +230,7 @@ namespace DownLoad
                         if (l > 0)
                         {
                             outStream.Write(buffer, 0, l);
-                            pDownRow.Cells["progress"].Value = (((double)(temp) / dataLength) * 100).ToString("0.00") + "%";
+                            pDownRow.Cells["progress"].Value = ((double)(temp) / dataLength*100).ToString("0.00") + "%";
                         }
                     } while (l > 0);
                     pDownRow.Cells["downloadstate"].Value = EnDownLoadState.DownLoaded;
@@ -216,6 +239,7 @@ namespace DownLoad
                 {
                     pDownRow.Cells["progress"].Value = "下载有误，未完成！:" + ex.Message;
                     pDownRow.Cells["downloadstate"].Value = EnDownLoadState.Error;
+                    pDownRow.DefaultCellStyle = m_ErrorStyle;
                 }
                 finally
                 {
@@ -229,12 +253,17 @@ namespace DownLoad
                     {
                         m_DownLoadList.Remove(pDownRow.Cells["dataid"].Value.ToString());
                     }
+                    if (pDownRow.Cells["progress"].Value.ToString() != "100.00%")
+                    {
+                        if (System.IO.File.Exists(state.FileName)) System.IO.File.Delete(state.FileName);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 pDownRow.Cells["progress"].Value = ex.Message;
                 pDownRow.Cells["downloadstate"].Value = EnDownLoadState.Error;
+                pDownRow.DefaultCellStyle = m_ErrorStyle;
             }
             finally
             {
@@ -242,6 +271,20 @@ namespace DownLoad
                 {
                     m_DownLoadList.Remove(pDownRow.Cells["dataid"].Value.ToString());
                 }
+                //写入数据库
+                updateStr.SetValue(string.Format("uri='{0}'", pDownRow.Cells["uri"].Value.ToString()), 0);
+                string proStr = pDownRow.Cells["progress"].Value.ToString();
+                if (proStr == "100.00%")
+                {
+                    updateStr.SetValue(string.Format("progress='{0}'", 1), 1);
+                    pDownRow.DefaultCellStyle = m_DownLoadedStyle;
+                }
+                else
+                {
+                    updateStr.SetValue(string.Format("progress='{0}'", proStr), 1);
+                }
+                updateStr.SetValue(string.Format("downloadstate='{0}'", pDownRow.Cells["downloadstate"].Value.ToString()), 2);
+                m_DbOp.UpdateData("demdt", "dataid", pDownRow.Cells["dataid"].Value.ToString(), updateStr);
             }
         }
     }
